@@ -126,6 +126,31 @@
             margin-top: 0.5rem;
         }
 
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .action-btn {
+            flex-grow: 1;
+            text-align: center;
+            padding: 0.8rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: opacity 0.2s;
+            display: block; /* for anchor tags */
+        }
+        .action-btn:hover {
+            opacity: 0.85;
+        }
+        .action-btn.withdrawal-action {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
         /* Transaction Grouping */
         .transaction-group {
             margin-bottom: 1.5rem;
@@ -248,6 +273,10 @@
                 <h1 class="amount">$ 1,250.00 KHR</h1>
                 <p class="last-updated">Last Updated: 10/06/2025</p>
             </section>
+
+            <div class="action-buttons">
+                <a href="request-withdrawal.html" class="action-btn withdrawal-action">Request Withdrawal</a>
+            </div>
 
             <section class="transaction-group">
                 <h2 class="transaction-group-header">Today</h2>
