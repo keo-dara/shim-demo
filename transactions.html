@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transactions</title>
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --background-color: #f0f2f5;
+            --surface-color: #ffffff;
+            --on-surface-color: #333333;
+            --on-surface-secondary-color: #666666;
+            --border-color: #eeeeee;
+            --green-color: #28a745;
+            --red-color: #dc3545;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 4rem);
+            color: var(--on-surface-color);
+        }
+
+        .mobile-screen {
+            width: 100%;
+            max-width: 400px;
+            background-color: var(--surface-color);
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 850px; /* Fixed height for better demonstration */
+        }
+
+        main {
+            padding: 1.5rem;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        /* Header */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+        .app-header .header-title { font-weight: 600; font-size: 1.2rem; margin: 0; text-align: center; flex-grow: 1; }
+        .app-header .header-icon { font-size: 1.5rem; cursor: pointer; width: 24px; }
+        
+        /* Filter Tabs */
+        .filter-tabs {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            overflow-x: auto;
+            white-space: nowrap;
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        .filter-tabs::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+        .filter-tabs .tab {
+            padding: 0.5rem 1.25rem;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            background-color: var(--surface-color);
+            color: var(--secondary-color);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+        .filter-tabs .tab.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* Search Bar */
+        .search-bar {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            box-sizing: border-box; /* to include padding in width */
+        }
+
+        /* Balance Summary */
+        .balance-summary {
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: 16px;
+            background-color: var(--background-color);
+            margin-bottom: 1.5rem;
+        }
+        .balance-summary .label {
+            font-size: 0.9rem;
+            color: var(--on-surface-secondary-color);
+            margin-bottom: 0.5rem;
+        }
+        .balance-summary .amount {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--on-surface-color);
+            margin: 0;
+        }
+        .balance-summary .last-updated {
+            font-size: 0.8rem;
+            color: var(--on-surface-secondary-color);
+            margin-top: 0.5rem;
+        }
+
+        /* Transaction Grouping */
+        .transaction-group {
+            margin-bottom: 1.5rem;
+        }
+        .transaction-group-header {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--on-surface-secondary-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* Transaction List */
+        .transaction-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+        .transaction-item:not(:last-child) {
+            border-bottom: 1px solid var(--border-color);
+        }
+        .transaction-details {
+            flex-grow: 1;
+            margin-right: 1rem;
+        }
+        .transaction-details .time {
+            font-size: 0.8rem;
+            color: var(--on-surface-secondary-color);
+            margin-bottom: 0.25rem;
+        }
+        .transaction-details .description {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--on-surface-color);
+            margin: 0;
+        }
+        .transaction-details .status {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--secondary-color);
+            margin-top: 0.25rem;
+        }
+        .transaction-amount {
+            font-weight: 600;
+            font-size: 1rem;
+            white-space: nowrap;
+        }
+        .transaction-amount.deposit { color: var(--green-color); }
+        .transaction-amount.withdrawal { color: var(--red-color); }
+
+        /* Load More Button */
+        .load-more-btn {
+            width: 100%;
+            padding: 0.8rem;
+            margin-top: 1rem;
+            background-color: var(--background-color);
+            color: var(--primary-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .load-more-btn:hover {
+            background-color: #e2e6ea;
+        }
+
+        /* Footer Nav */
+        .app-footer {
+            display: flex;
+            justify-content: space-around;
+            padding: 0.5rem 1rem 1rem 1rem;
+            border-top: 1px solid var(--border-color);
+            background-color: var(--surface-color);
+            flex-shrink: 0;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-size: 0.75rem;
+            flex-basis: 0;
+            flex-grow: 1;
+        }
+        .nav-item.active { color: var(--primary-color); }
+        .nav-item .nav-icon { font-size: 1.5rem; }
+    </style>
+</head>
+<body>
+
+    <div class="mobile-screen">
+        <header class="app-header">
+            <div class="header-icon"></div> <!-- Placeholder for back button or menu -->
+            <h1 class="header-title">Transactions</h1>
+            <div class="header-icon"></div>
+        </header>
+
+        <main>
+            <div class="filter-tabs">
+                <button class="tab active">All</button>
+                <button class="tab">Deposits</button>
+                <button class="tab">Withdrawals</button>
+            </div>
+
+            <input type="text" class="search-bar" placeholder="🔍 Search by description or amount">
+
+            <section class="balance-summary">
+                <p class="label">Current Balance</p>
+                <h1 class="amount">$ 1,250.00 KHR</h1>
+                <p class="last-updated">Last Updated: 10/06/2025</p>
+            </section>
+
+            <section class="transaction-group">
+                <h2 class="transaction-group-header">Today</h2>
+                <ul class="transaction-list">
+                    <li class="transaction-item">
+                        <div class="transaction-details">
+                            <p class="time">10:30 PM</p>
+                            <p class="description">Deposit: Monthly Contribution</p>
+                        </div>
+                        <div class="transaction-amount deposit">+$100.00 KHR</div>
+                    </li>
+                </ul>
+            </section>
+
+            <section class="transaction-group">
+                <h2 class="transaction-group-header">Yesterday</h2>
+                <ul class="transaction-list">
+                    <li class="transaction-item">
+                        <div class="transaction-details">
+                            <p class="time">03:15 PM</p>
+                            <p class="description">Withdrawal: Personal Request</p>
+                            <p class="status">Status: Pending</p>
+                        </div>
+                        <div class="transaction-amount withdrawal">-$50.00 KHR</div>
+                    </li>
+                    <li class="transaction-item">
+                        <div class="transaction-details">
+                            <p class="time">09:00 AM</p>
+                            <p class="description">Deposit: Event Fund</p>
+                        </div>
+                        <div class="transaction-amount deposit">+$20.00 KHR</div>
+                    </li>
+                </ul>
+            </section>
+
+            <section class="transaction-group">
+                <h2 class="transaction-group-header">June 7, 2025</h2>
+                <ul class="transaction-list">
+                    <li class="transaction-item">
+                        <div class="transaction-details">
+                            <p class="time">11:45 AM</p>
+                            <p class="description">Withdrawal: Rent Payment</p>
+                        </div>
+                        <div class="transaction-amount withdrawal">-$300.00 KHR</div>
+                    </li>
+                </ul>
+            </section>
+
+            <button class="load-more-btn">Load More</button>
+        </main>
+
+        <footer class="app-footer">
+            <a href="user.html" class="nav-item">
+                <div class="nav-icon">🏠</div>
+                <span>Home</span>
+            </a>
+            <a href="transactions.html" class="nav-item active">
+                <div class="nav-icon">🧾</div>
+                <span>Txns</span>
+            </a>
+            <a href="profile.html" class="nav-item">
+                <div class="nav-icon">👤</div>
+                <span>Profile</span>
+            </a>
+            <a href="#" class="nav-item">
+                <div class="nav-icon">💬</div>
+                <span>Support</span>
+            </a>
+        </footer>
+    </div>
+
+</body>
+</html>
