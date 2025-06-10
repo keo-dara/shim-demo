@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --background-color: #f0f2f5;
+            --surface-color: #ffffff;
+            --on-surface-color: #333333;
+            --on-surface-secondary-color: #666666;
+            --border-color: #eeeeee;
+            --green-color: #28a745;
+            --red-color: #dc3545;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 4rem);
+            color: var(--on-surface-color);
+        }
+
+        .mobile-screen {
+            width: 100%;
+            max-width: 400px;
+            background-color: var(--surface-color);
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 850px; /* Fixed height for better demonstration */
+        }
+
+        main {
+            padding: 1.5rem;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        /* Header */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+        .app-header .logo { font-weight: bold; }
+        .app-header .greeting { margin: 0; font-size: 1rem; }
+        .app-header .notification-bell { font-size: 1.5rem; cursor: pointer; }
+
+        /* Balance Card */
+        .balance-card {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+            padding: 2rem 1.5rem;
+            border-radius: 16px;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        .balance-card p { margin: 0; opacity: 0.9; font-size: 0.9rem; }
+        .balance-card .balance-amount {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+            letter-spacing: -1px;
+        }
+        .balance-card .last-updated { font-size: 0.8rem; opacity: 0.7; margin-bottom: 1.5rem; }
+        .balance-card .history-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 20px;
+            transition: background-color 0.2s;
+        }
+        .balance-card .history-link:hover { background-color: rgba(255, 255, 255, 0.1); }
+
+        /* Actions */
+        .actions {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            padding: 1rem 0;
+        }
+        .action-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .action-item .icon-wrapper {
+            font-size: 1.5rem;
+            background-color: var(--background-color);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+        .action-item:hover .icon-wrapper {
+            background-color: #e2e6ea;
+        }
+        .action-item span { font-size: 0.8rem; font-weight: 500; color: var(--on-surface-secondary-color); }
+
+        /* Generic Card for other sections */
+        .card {
+            background-color: var(--surface-color);
+            padding: 1.5rem;
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+        .card h2 {
+            font-size: 1.1rem;
+            margin-top: 0;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* Monthly Contribution */
+        .contribution-details p {
+            display: flex;
+            justify-content: space-between;
+            margin: 0.75rem 0;
+            font-size: 0.9rem;
+            color: var(--on-surface-secondary-color);
+        }
+        .contribution-details p strong { color: var(--on-surface-color); }
+        .pay-now-btn {
+            width: 100%;
+            padding: 0.8rem;
+            margin-top: 1rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .pay-now-btn:hover { background-color: #0056b3; }
+
+        /* Recent Transactions */
+        .transaction-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .transaction-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 0;
+        }
+        .transaction-item:not(:last-child) {
+            border-bottom: 1px solid var(--border-color);
+        }
+        .transaction-icon {
+            font-size: 1.5rem;
+            margin-right: 1rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: var(--background-color);
+        }
+        .transaction-details {
+            flex-grow: 1;
+        }
+        .transaction-details p { margin: 0; font-size: 0.9rem; line-height: 1.4; }
+        .transaction-details .description { color: var(--on-surface-secondary-color); font-size: 0.8rem; }
+        .transaction-amount {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        .transaction-amount.deposit { color: var(--green-color); }
+        .transaction-amount.withdrawal { color: var(--red-color); }
+        .see-all-link {
+            display: block;
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* Footer Nav */
+        .app-footer {
+            display: flex;
+            justify-content: space-around;
+            padding: 0.5rem 1rem 1rem 1rem;
+            border-top: 1px solid var(--border-color);
+            background-color: var(--surface-color);
+            flex-shrink: 0;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-size: 0.75rem;
+            flex-basis: 0;
+            flex-grow: 1;
+        }
+        .nav-item.active { color: var(--primary-color); }
+        .nav-item .nav-icon { font-size: 1.5rem; }
+    </style>
+</head>
+<body>
+
+    <div class="mobile-screen">
+        <header class="app-header">
+            <div class="logo">[Logo]</div>
+            <p class="greeting">Good Afternoon, John!</p>
+            <div class="notification-bell">🔔</div>
+        </header>
+
+        <main>
+            <section class="balance-card">
+                <p>Current Balance</p>
+                <h1 class="balance-amount">$ 1,250.00 KHR</h1>
+                <p class="last-updated">Last Updated: 10/06/2025</p>
+                <a href="#" class="history-link">View Full Transaction History</a>
+            </section>
+
+            <section class="actions">
+                <a href="#" class="action-item">
+                    <div class="icon-wrapper">📥</div>
+                    <span>Deposit</span>
+                </a>
+                <a href="#" class="action-item">
+                    <div class="icon-wrapper">📤</div>
+                    <span>Withdraw</span>
+                </a>
+                <a href="#" class="action-item">
+                    <div class="icon-wrapper">🔄</div>
+                    <span>Make Monthly</span>
+                </a>
+            </section>
+
+            <div class="card">
+                <h2>My Monthly Contribution</h2>
+                <div class="contribution-details">
+                    <p>Next Payment Due: <strong>Jul 1st, 2025</strong></p>
+                    <p>Amount: <strong>$50.00 KHR</strong></p>
+                    <p>Last Payment: <span>$50 on Jun 1st, 2025</span></p>
+                </div>
+                <button class="pay-now-btn">Pay Now</button>
+            </div>
+
+            <div class="card">
+                <h2>Recent Transactions</h2>
+                <ul class="transaction-list">
+                    <li class="transaction-item">
+                        <div class="transaction-icon">➕</div>
+                        <div class="transaction-details">
+                            <p>Deposit</p>
+                            <p class="description">Monthly Contribution</p>
+                        </div>
+                        <div class="transaction-amount deposit">+$100.00</div>
+                    </li>
+                    <li class="transaction-item">
+                        <div class="transaction-icon">➖</div>
+                        <div class="transaction-details">
+                            <p>Withdrawal</p>
+                            <p class="description">Request #123 (Pending)</p>
+                        </div>
+                        <div class="transaction-amount withdrawal">-$50.00</div>
+                    </li>
+                    <li class="transaction-item">
+                        <div class="transaction-icon">➕</div>
+                        <div class="transaction-details">
+                            <p>Deposit</p>
+                            <p class="description">Event Fund</p>
+                        </div>
+                        <div class="transaction-amount deposit">+$50.00</div>
+                    </li>
+                </ul>
+                <a href="#" class="see-all-link">See All Transactions</a>
+            </div>
+        </main>
+
+        <footer class="app-footer">
+            <a href="#" class="nav-item active">
+                <div class="nav-icon">🏠</div>
+                <span>Home</span>
+            </a>
+            <a href="#" class="nav-item">
+                <div class="nav-icon">🧾</div>
+                <span>Txns</span>
+            </a>
+            <a href="#" class="nav-item">
+                <div class="nav-icon">👤</div>
+                <span>Profile</span>
+            </a>
+            <a href="#" class="nav-item">
+                <div class="nav-icon">💬</div>
+                <span>Support</span>
+            </a>
+        </footer>
+    </div>
+
+</body>
+</html>
